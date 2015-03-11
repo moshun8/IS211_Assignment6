@@ -5,6 +5,7 @@
 from conversions import convertCelsiusToKelvin, convertCelsiusToFahrenheit
 from conversions import convertFahrenheitToCelsius, convertFahrenheitToKelvin
 from conversions import convertKelvinToCelsius, convertKelvintoFahrenheit
+from conversions_refactored import convert, ConversionNotPossible
 import unittest
 
 
@@ -214,6 +215,116 @@ class TestK2F(unittest.TestCase):
     def test_largepos(self):
         result5 = convertKelvintoFahrenheit(self.temp5)
         self.assertEqual(result5, 1762.448)
+
+
+class TestRefactor_TempConvert(unittest.TestCase):
+    '''Tests all the temp combinations to make sure they work'''
+
+
+    def test_c2k(self):
+        result = convert('celsius', 'kelvin', 100.0)
+        self.assertEqual(result, 373.15)
+
+
+    def test_c2f(self):
+        result = convert('celsius', 'fahrenheit', 100.0)
+        self.assertEqual(result, 212.0)
+
+
+    def test_k2f(self):
+        result = convert('kelvin', 'fahrenheit', 100.0)
+        self.assertAlmostEqual(result, -279.67)
+
+
+    def test_k2c(self):
+        result = convert('kelvin', 'celsius', 100.0)
+        self.assertAlmostEqual(result, -173.15)
+
+
+    def test_f2k(self):
+        result = convert('fahrenheit', 'kelvin', 100.0)
+        self.assertAlmostEqual(result, 310.928, 2)
+
+
+    def test_f2c(self):
+        result = convert('fahrenheit', 'celsius', 100.0)
+        self.assertAlmostEqual(result, 37.777, 3)
+
+
+class TestRefactor_LenConvert(unittest.TestCase):
+    '''Tests all the length conversion combos'''
+
+
+    def test_m2y(self):
+        result = convert('meters', 'yards', 100.0)
+        self.assertAlmostEqual(result, 109.36, 2)
+
+
+    def test_m2mi(self):
+        result = convert('meters', 'miles', 100.0)
+        self.assertAlmostEqual(result, 0.0621371)
+
+
+    def test_y2m(self):
+        result = convert('yards', 'meters', 100.0)
+        self.assertEqual(result, 91.44)
+
+
+    def test_y2mi(self):
+        result = convert('yards', 'miles', 100.0)
+        self.assertAlmostEqual(result, 0.05681, 4)
+
+
+    def test_mi2m(self):
+        result = convert('miles', 'meters', 100.0)
+        self.assertEqual(result, 160934.4)
+
+
+    def test_mi2y(self):
+        result = convert('miles', 'yards', 10.0)
+        self.assertAlmostEqual(result, 17600, 0)
+
+
+class TestRefactor_ReturnSelf(unittest.TestCase):
+    '''Makes sure all conversions return itself'''
+
+
+    def test_c2c(self):
+        result = convert('celsius', 'celsius', 10.0)
+        self.assertEqual(result, 10.0)
+
+
+    def test_f2f(self):
+        result = convert('fahrenheit', 'fahrenheit', 10.0)
+        self.assertAlmostEqual(result, 10.0, 3)
+
+
+    def test_k2k(self):
+        result = convert('kelvin', 'kelvin', 10.0)
+        self.assertEqual(result, 10.0)
+
+
+    def test_m2m(self):
+        result = convert('meters', 'meters', 10.0)
+        self.assertEqual(result, 10.0)
+
+
+    def test_y2y(self):
+        result = convert('yards', 'yards', 10.0)
+        self.assertAlmostEqual(result, 10.0, 3)
+
+
+    def test_mi2mi(self):
+        result = convert('miles', 'miles', 10.0)
+        self.assertAlmostEqual(result, 10.0, 3)
+
+
+class Test_Incompatible(unittest.TestCase):
+    '''Tests that exception thrown when len/temp are converted'''
+
+    def test_tempAndLen(self):
+        self.assertRaises(ConversionNotPossible, convert(
+            'meters', 'celsius', 100.0))
 
 
 if __name__ == '__main__':
